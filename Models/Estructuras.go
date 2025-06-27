@@ -1,5 +1,7 @@
 package Models
 
+import _ "fmt"
+
 type Usuarios struct {
 	Nombre string
 	Edad   int
@@ -36,13 +38,15 @@ type Empleados struct {
 	Usuarios
 	Cargo          string
 	Salario        float64
-	codigoEmpleado string
+	CodigoEmpleado string
 	Catalogo       Catalogos
 }
 
 type Productos struct {
+	Id             int
 	Nombre         string
 	PrecioUnitario float64
+	CodigoProducto string
 }
 
 type Catalogos struct {
@@ -51,4 +55,30 @@ type Catalogos struct {
 
 func (c *Catalogos) AgregarProducto(Nuevoproducto Productos) {
 	c.Producto5 = append(c.Producto5, Nuevoproducto)
+}
+
+/*func (c *Catalogos) BuscarProducto (IdBusqueda int) *Productos {
+	for_, producto := range c.Producto5 {
+		if producto.Id == IdBusqueda {
+			return &c.Producto5[producto.Id]
+		}
+	}
+}*/
+
+func (c *Catalogos) BuscarProducto(IdBusqueda int) *Productos {
+	for i := range c.Producto5 {
+		if c.Producto5[i].Id == IdBusqueda {
+			return &c.Producto5[i]
+		}
+	}
+	return nil
+}
+
+func (c *Catalogos) ModificarProducto(IdBusqueda int, nuevoProducto Productos) bool {
+	producto := c.BuscarProducto(IdBusqueda)
+	if producto != nil {
+		*producto = nuevoProducto
+		return true
+	}
+	return false
 }

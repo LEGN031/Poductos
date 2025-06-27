@@ -3,7 +3,6 @@ package main
 import (
 	"Productos/Models"
 	"fmt"
-	"strconv"
 )
 
 func main() {
@@ -32,8 +31,8 @@ func main() {
 		},
 	}*/
 
-	laptop := Models.Productos{Nombre: "Laptop", PrecioUnitario: 1200}
-	mouse := Models.Productos{Nombre: "Mouse", PrecioUnitario: 25}
+	laptop := Models.Productos{Nombre: "Laptop", PrecioUnitario: 1200, CodigoProducto: "LAP123", Id: 1}
+	mouse := Models.Productos{Nombre: "Mouse", PrecioUnitario: 25, CodigoProducto: "MOU456", Id: 2}
 
 	catalogo := Models.Catalogos{
 		Producto5: []Models.Productos{laptop, mouse},
@@ -59,14 +58,37 @@ func main() {
 			case 1:
 				var nombre string
 				var precio float64
+				var id int
+				var codigo string
+				fmt.Print("Ingrese el id del producto: ")
+				fmt.Scanln(&id)
+				fmt.Print("Ingrese el código del producto: ")
+				fmt.Scanln(&codigo)
 				fmt.Print("Ingrese el nombre del producto: ")
 				fmt.Scanln(&nombre)
 				fmt.Print("Ingrese el precio unitario: ")
 				fmt.Scanln(&precio)
 				catalogo.AgregarProducto(Models.Productos{Nombre: nombre, PrecioUnitario: precio})
 			case 2:
-				// Aquí deberías mostrar la lista de productos y permitir modificar uno
-				fmt.Println("Funcionalidad de modificar producto (por implementar)")
+				var id int
+				var nombre string
+				var precio float64
+				var codigo string
+				var Nuevoproducto Models.Productos
+				var IdBusqueda int
+				fmt.Print("Ingrese el id del producto a modificar (0 para el primero): ")
+				fmt.Scanln(&IdBusqueda)
+				fmt.Print("Ingrese el nuevo id del producto: ")
+				fmt.Scanln(&id)
+				fmt.Print("Ingrese el nuevo nombre del producto: ")
+				fmt.Scanln(&nombre)
+				fmt.Print("Ingrese el nuevo precio unitario: ")
+				fmt.Scanln(&precio)
+				fmt.Print("Ingrese el nuevo código del producto: ")
+				fmt.Scanln(&codigo)
+				Nuevoproducto = Models.Productos{Id: id, Nombre: nombre, PrecioUnitario: precio, CodigoProducto: codigo}
+				catalogo.ModificarProducto(IdBusqueda, Nuevoproducto)
+
 			case 3:
 				// Aquí deberías mostrar la lista de productos y permitir eliminar uno
 				fmt.Println("Funcionalidad de eliminar producto (por implementar)")
@@ -97,10 +119,7 @@ func main() {
 
 		}
 	} else {
-		opcion, err := strconv.Atoi(respuesta)
-		if err != nil {
-			fmt.Println("Opción no válida, por favor ingrese 1 para empleado o 2 para cliente.")
-			return
-		}
+		fmt.Println("Opción no válida. Intenta nuevamente.")
+		return
 	}
 }
