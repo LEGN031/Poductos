@@ -8,27 +8,28 @@ import (
 func main() {
 	var respuesta string
 
+	laptop := Models.Productos{Nombre: "Laptop", PrecioUnitario: 1200, CodigoProducto: "LAP123", Id: 1}
+	mouse := Models.Productos{Nombre: "Mouse", PrecioUnitario: 25, CodigoProducto: "MOU456", Id: 2}
+	teclado := Models.Productos{Nombre: "Teclado", PrecioUnitario: 45, CodigoProducto: "TEC789", Id: 3}
+
 	clientes := []Models.Clientes{
 		{
 			Usuarios: Models.Usuarios{Nombre: "Carlos", Edad: 40, Cedula: "111222", Id: 1},
 			ListaCompra: []Models.Compra{
-				{Producto: Models.Productos{Nombre: "Laptop", PrecioUnitario: 1200, CodigoProducto: "LAP123", Id: 1}, Cantidad: 1},
-				{Producto: Models.Productos{Nombre: "Mouse", PrecioUnitario: 25, CodigoProducto: "MOU456", Id: 2}, Cantidad: 2},
+				{Producto: laptop, Cantidad: 1},
+				{Producto: mouse, Cantidad: 2},
 			},
 		},
 		{
 			Usuarios: Models.Usuarios{Nombre: "Maria", Edad: 35, Cedula: "333444", Id: 2},
 			ListaCompra: []Models.Compra{
-				{Producto: Models.Productos{Nombre: "Teclado", PrecioUnitario: 45}, Cantidad: 4},
+				{Producto: teclado, Cantidad: 4},
 			},
 		},
 	}
 
-	laptop := Models.Productos{Nombre: "Laptop", PrecioUnitario: 1200, CodigoProducto: "LAP123", Id: 1}
-	mouse := Models.Productos{Nombre: "Mouse", PrecioUnitario: 25, CodigoProducto: "MOU456", Id: 2}
-
 	catalogo := Models.Catalogos{
-		Producto5: []Models.Productos{laptop, mouse},
+		Producto5: []Models.Productos{laptop, mouse, teclado},
 	}
 
 	fmt.Println("Bienvenido al sistema de gestión de usuarios y Compras")
@@ -87,9 +88,10 @@ func main() {
 					fmt.Println("Producto no encontrado.")
 				}
 			case 4:
-				fmt.Println("Productos en el catálogo:")
-				for _, producto := range catalogo.Producto5 {
-					fmt.Println("Id:", producto.Id, "Nombre:", producto.Nombre, "Precio Unitario:", producto.PrecioUnitario, "Código:", producto.CodigoProducto)
+				if catalogo.ImprimirCatalago() {
+					fmt.Println("Catálogo impreso correctamente.")
+				} else {
+					fmt.Println("No hay productos en el catálogo.")
 				}
 			case 5:
 				fmt.Println("Saliendo del sistema...")
@@ -136,7 +138,7 @@ func main() {
 
 				clientes = append(clientes, nuevoCliente)
 				fmt.Println("Cliente registrado correctamente.")
-				OpcionesCliente(&clientes[len(clientes)-1], &catalogo)
+				OpcionesCliente(&clientes[len(clientes)-1], &catalogo, &clientes)
 			} else if respuestaCedula == "2" {
 				fmt.Println("Por favor, intente nuevamente con una cédula válida.")
 				return
@@ -145,21 +147,21 @@ func main() {
 				return
 			}
 		} else {
-			OpcionesCliente(clienteEncontrado, &catalogo)
+			OpcionesCliente(clienteEncontrado, &catalogo, &clientes)
 		}
 	} else {
 		fmt.Println("Opción no válida. Intente nuevamente.")
 	}
 }
 
-func OpcionesCliente(cliente *Models.Clientes, catalogo *Models.Catalogos) {
+func OpcionesCliente(cliente *Models.Clientes, catalogo *Models.Catalogos, clientes *[]Models.Clientes) {
 	for {
 		var opcion int
 		fmt.Println("Opciones de Clientes:")
 		fmt.Println("1. Agregar producto a la cesta")
-		fmt.Println("2. Modificar producto")
-		fmt.Println("3. Eliminar producto")
-		fmt.Println("4. Imprimir")
+		fmt.Println("2. Eliminar producto")
+		fmt.Println("3. Imprimir cesta")
+		fmt.Println("4. Imprimir costo total de la cesta")
 		fmt.Println("5. Salir")
 		fmt.Print("Seleccione una opción: ")
 		fmt.Scanln(&opcion)
@@ -178,14 +180,27 @@ func OpcionesCliente(cliente *Models.Clientes, catalogo *Models.Catalogos) {
 				fmt.Println("Producto no encontrado o cantidad inválida.")
 			}
 		case 2:
-			// Aquí puedes implementar la opción de modificar un producto en la cesta
-		case 3:
-			// Aquí puedes implementar la opción de eliminar un producto en la cesta
-		case 4:
-			fmt.Println("Productos en la cesta de compras:")
-			for _, compra := range cliente.ListaCompra {
-				fmt.Println("Producto:", compra.Producto.Nombre, "Cantidad:", compra.Cantidad, "Precio Unitario:", compra.Producto.PrecioUnitario)
+			var codigoBusqueda string
+			var cantidad int
+			fmt.Println("Ingrese el codigo del producto a eliminar de la cesta:")
+			fmt.Scanln(&codigoBusqueda)
+			fmt.Println("Ingrese la cantidad del producto a eliminar de la cesta:")
+			fmt.Scanln(&cantidad)
+			if cliente.EliminarDelaCesta(codigoBusqueda, catalogo, cantidad) {
+				fmt.Println("Producto elimnado de la cesta correctamente")
+			} else {
+				fmt.Println("Prroducto no encontrado")
 			}
+		case 3:
+			fmt.Printf("Cliente: %s, Edad: %d, Cédula: %s\n", cliente.Usuarios.Nombre, cliente.Usuarios.Edad, cliente.Usuarios.Cedula)
+			if len(cliente.ListaCompra) > 0 {
+				fmt.Println("Productos en la cesta:")
+				cliente.ImprimirCesta()
+			} else {
+				fmt.Println("No hay productos en la cesta.")
+			}
+		case 4:
+			fmt.Println("Costo total: ", cliente.TotalCompras())
 		case 5:
 			fmt.Println("Saliendo del sistema...")
 			return

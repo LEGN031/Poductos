@@ -1,6 +1,8 @@
 package Models
 
-import _ "fmt"
+import (
+	"fmt"
+)
 
 type Usuarios struct {
 	Id     int
@@ -120,7 +122,7 @@ func (c *Clientes) AñadirProductoALaCesta(catalogo *Catalogos, codigoBusqueda s
 		producto := catalogo.Producto5[indice]
 
 		for i := range c.ListaCompra {
-			if c.ListaCompra[i].Producto.Id == producto.Id {
+			if c.ListaCompra[i].Producto.CodigoProducto == producto.CodigoProducto {
 				c.ListaCompra[i].Cantidad += cantidad
 				return true
 			}
@@ -131,10 +133,38 @@ func (c *Clientes) AñadirProductoALaCesta(catalogo *Catalogos, codigoBusqueda s
 	return false
 }
 
-func (c *Clientes) CrearNuevoRegistro(nombre string, edad int, cedula string, contraseña string) {
-	c.Usuarios.Nombre = nombre
-	c.Usuarios.Edad = edad
-	c.Usuarios.Cedula = cedula
-	c.Contraseña = contraseña
-	c.ListaCompra = []Compra{}
+func (c *Catalogos) ImprimirCatalago() bool {
+	if len(c.Producto5) > 0 {
+		fmt.Println("Productos en el catálogo:")
+		for _, producto := range c.Producto5 {
+			fmt.Println("Id:", producto.Id, "Nombre:", producto.Nombre, "Precio Unitario:", producto.PrecioUnitario, "Código:", producto.CodigoProducto)
+		}
+		return true
+	}
+	return false
+}
+
+func (c *Clientes) ImprimirCesta() bool {
+	if len(c.ListaCompra) > 0 {
+		fmt.Println("Productos en el catálogo:")
+		for _, producto := range c.ListaCompra {
+			fmt.Println("Id:", producto.Producto.Id, "Nombre:", producto.Producto.Nombre, "Precio Unitario:", producto.Producto.PrecioUnitario, "Código:", producto.Producto.CodigoProducto, "Cantidad:", producto.Cantidad, "Precio", producto.Precio())
+		}
+		return true
+	}
+	return false
+}
+
+func (c *Clientes) EliminarDelaCesta(codigoBusqueda string, cat *Catalogos, cantidad int) bool {
+	for i := range c.ListaCompra {
+		if c.ListaCompra[i].Producto.CodigoProducto == codigoBusqueda {
+			if c.ListaCompra[i].Cantidad > 1 {
+				c.ListaCompra[i].Cantidad = c.ListaCompra[i].Cantidad - cantidad
+			} else {
+				c.ListaCompra = append(c.ListaCompra[:i], c.ListaCompra[i+1:]...)
+			}
+			return true
+		}
+	}
+	return false
 }
